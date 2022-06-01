@@ -452,12 +452,7 @@ vector<Person> changePersonDetails(vector<Person> personVector) {
 }
 
 
-int main() {
-
-    char character;
-    vector<Person> personVector;
-    personVector = loadFile();
-
+void menuAddressBook(char character, vector<Person> personVector){
 
     while(true) {
         system("cls");
@@ -505,5 +500,15 @@ int main() {
         }
 
     }
+}
+
+int main() {
+
+    char character;
+    vector<Person> personVector;
+    personVector = loadFile();
+
+
+    menuAddressBook(character, personVector);
     return 0;
 }
