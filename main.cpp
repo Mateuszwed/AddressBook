@@ -29,141 +29,6 @@ string loadLine() {
     return input;
 }
 
-//--------------------------------------Register and login-----------------------------------------
-
-struct User {
-
-string username;
-string password;
-int id;
-
-};
-
-bool findUsernameInDataBase(vector<User> userVector, string username){
-
-for(int i = 0; i < userVector.size(); i++){
-
-    if(userVector[i].username == username){
-        return true;
-    }
-}
-return false;
-}
-
-vector<User> loadUserAccountFile() {
-    User user;
-    vector<User> userVector;
-    fstream file;
-    file.open("UserAccount.txt", ios::in);
-
-    int IdNumber;
-    string id, username, password;
-
-    while(file.good()) {
-        getline(file, id, '|');
-        getline(file, username, '|');
-        getline(file, password, '|');
-
-        if(!file.good()) {
-            break;
-        }
-
-        IdNumber = atoi(id.c_str());
-
-        user.id = IdNumber;
-        user.username = username;
-        user.password = password;
-        userVector.push_back(user);
-
-
-    }
-    file.close();
-    return userVector;
-}
-
-
-void addUserToFile(User user) {
-    fstream file;
-    file.open("UserAccount.txt", ios::out | ios::app);
-
-    file << user.id << '|';
-    file << user.username << '|';
-    file << user.password << '|' << endl;
-
-    file.close();
-}
-
-vector<User> registerUser(vector<User> userVector) {
-
-    User user;
-    string username;
-    string password;
-    int id;
-
-    cout << "Podaj nazwe uzytkownika: ";
-    username = loadLine();
-
-    while(true)
-
-        if(findUsernameInDataBase(userVector, username)) {
-
-            cout << "Uzytkownik o takiej nazwie juz istnieje, podaj inna nazwe uzytkownika: ";
-            username = loadLine();
-
-        } else {
-
-            cout << "Podaj haslo: ";
-            password = loadLine();
-
-            if(userVector.empty()) {
-                id = 1;
-            } else {
-                id = userVector[userVector.size()-1].id + 1;
-            }
-
-            user.username = username;
-            user.password = password;
-            user.id = id;
-            userVector.push_back(user);
-            addUserToFile(user);
-            cout << "Utworzyles konto, mozesz sie teraz zalogowac.";
-            Sleep(1500);
-            return userVector;
-        }
-}
-
-
-void menuLoginAndRegister(char character, vector<User> userVector) {
-
-while(true){
-    system("cls");
-    cout << "+---------------------------------+" << endl;
-    cout << "|      >>>> Menu Glowne <<<<      |" << endl;
-    cout << "|---------------------------------|" << endl;
-    cout << "|1.Rejestracja                    |" << endl;
-    cout << "|2.Logowanie                      |" << endl;
-    cout << "|3.Wyjscie                        |" << endl;
-    cout << "+---------------------------------+" << endl;
-
-    character = loadCharacter();
-
-    switch(character) {
-
-    case '1':
-        userVector = registerUser(userVector);
-        break;
-    case '2':
-
-        break;
-    case '3':
-
-        cout << "Do zobaczenia!";
-        Sleep(1000);
-        exit('0');
-    }
-
-}
-}
 //------------------------------------------Address Book---------------------------------
 struct Person {
     int id;
@@ -636,6 +501,181 @@ void menuAddressBook(char character, vector<Person> personVector){
         }
 
     }
+}
+
+//--------------------------------------Register and login-----------------------------------------
+
+struct User {
+
+string username;
+string password;
+int id;
+
+};
+
+bool findUsernameInDataBase(vector<User> userVector, string username){
+
+for(int i = 0; i < userVector.size(); i++){
+
+    if(userVector[i].username == username){
+        return true;
+    }
+}
+return false;
+}
+
+vector<User> loadUserAccountFile() {
+    User user;
+    vector<User> userVector;
+    fstream file;
+    file.open("UserAccount.txt", ios::in);
+
+    int IdNumber;
+    string id, username, password;
+
+    while(file.good()) {
+        getline(file, id, '|');
+        getline(file, username, '|');
+        getline(file, password, '|');
+
+        if(!file.good()) {
+            break;
+        }
+
+        IdNumber = atoi(id.c_str());
+
+        user.id = IdNumber;
+        user.username = username;
+        user.password = password;
+        userVector.push_back(user);
+
+
+    }
+    file.close();
+    return userVector;
+}
+
+
+void addUserToFile(User user) {
+    fstream file;
+    file.open("UserAccount.txt", ios::out | ios::app);
+
+    file << user.id << '|';
+    file << user.username << '|';
+    file << user.password << '|' << endl;
+
+    file.close();
+}
+
+vector<User> registerUser(vector<User> userVector) {
+
+    User user;
+    string username;
+    string password;
+    int id;
+
+    cout << "Podaj nazwe uzytkownika: ";
+    username = loadLine();
+
+    while(true)
+
+        if(findUsernameInDataBase(userVector, username)) {
+
+            cout << "Uzytkownik o takiej nazwie juz istnieje, podaj inna nazwe uzytkownika: ";
+            username = loadLine();
+
+        } else {
+
+            cout << "Podaj haslo: ";
+            password = loadLine();
+
+            if(userVector.empty()) {
+                id = 1;
+            } else {
+                id = userVector[userVector.size()-1].id + 1;
+            }
+
+            user.username = username;
+            user.password = password;
+            user.id = id;
+            userVector.push_back(user);
+            addUserToFile(user);
+            cout << "Utworzyles konto, mozesz sie teraz zalogowac.";
+            Sleep(1500);
+            return userVector;
+        }
+}
+
+
+int loginUser(vector<User> userVector) {
+
+    string username;
+    string password;
+    cout << "Podaj nazwe uzytkownika: ";
+    username = loadLine();
+    const int TRIALS = 3;
+    int i = 0;
+    while(i < userVector.size()) {
+
+        if(userVector[i].username == username) {
+
+            for(int i = 0; i < TRIALS; i++) {
+                cout << ">> Liczba prob: " << TRIALS - i << endl;
+                cout << "Podaj haslo: ";
+                password = loadLine();
+                if(userVector[i].password == password) {
+
+                    cout << "Zalogowales sie.";
+                    Sleep(1500);
+                    return userVector[i].id;
+                }
+
+            }
+            cout << "Podales 3 razy nieprawidlowe haslo.";
+            Sleep(3000);
+            return 0;
+        } else {
+            cout << "Nie istnieje uzytkownik o takiej nazwie.";
+            Sleep(1500);
+            return userVector.size();
+        }
+    }
+
+}
+
+void menuLoginAndRegister(char character, vector<User> userVector) {
+
+int userId;
+
+while(true){
+    system("cls");
+    cout << "+---------------------------------+" << endl;
+    cout << "|      >>>> Menu Glowne <<<<      |" << endl;
+    cout << "|---------------------------------|" << endl;
+    cout << "|1.Rejestracja                    |" << endl;
+    cout << "|2.Logowanie                      |" << endl;
+    cout << "|3.Wyjscie                        |" << endl;
+    cout << "+---------------------------------+" << endl;
+
+    character = loadCharacter();
+
+    switch(character) {
+
+    case '1':
+        userVector = registerUser(userVector);
+        break;
+    case '2':
+        userId = loginUser(userVector);
+        break;
+    case '3':
+
+        cout << "Do zobaczenia!";
+        Sleep(1000);
+        exit('0');
+    }
+
+}
+
 }
 
 int main() {
