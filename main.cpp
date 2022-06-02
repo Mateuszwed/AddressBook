@@ -71,14 +71,14 @@ vector<Person> loadPersonsToFile(int idUser) {
         idUserWithFile = atoi(idUserWithFileString.c_str());
         IdNumber = atoi(id.c_str());
 
-        if(idUserWithFile == idUser){
-        person.id = IdNumber;
-        person.name = name;
-        person.lastname = lastname;
-        person.phoneNumber = phoneNumber;
-        person.email = email;
-        person.address = address;
-        personVector.push_back(person);
+        if(idUserWithFile == idUser) {
+            person.id = IdNumber;
+            person.name = name;
+            person.lastname = lastname;
+            person.phoneNumber = phoneNumber;
+            person.email = email;
+            person.address = address;
+            personVector.push_back(person);
         }
 
     }
@@ -284,41 +284,28 @@ vector<Person> deleteAllPersons(vector<Person> personVector) {
 }
 
 
-void deleteContactFromFile(int idNumber)
-{
-	fstream file, temp;
-	file.open("addressBook.txt", ios::in);
-	temp.open("temp.txt", ios::out);
-	if (file.good() && temp.good())
-	{
-		string loadedLine;
-		while (getline(file, loadedLine))
-		{
-			if (loadedLine[0] - '0' == idNumber)
-				continue;
-			temp << loadedLine << endl;
-		}
-	}
-	file.close();
-	file.clear();
-	temp.close();
-	temp.clear();
-	remove("addressBook.txt");
-	rename("temp.txt", "addressBook.txt");
-}
+void deletePersonFromFile(int idNumber) {
 
-/*
-void deleteOldFileAndAddNewFileWithVector (vector<Person> personVector) {
+    fstream file;
+    fstream temp;
+    file.open("addressBook.txt", ios::in);
+    temp.open("temp.txt", ios::out);
+    if (file.good() && temp.good()) {
+        string loadedLine;
+        while (getline(file, loadedLine)) {
+            if (loadedLine[0] - '0' == idNumber)
+                continue;
+            temp << loadedLine << endl;
+        }
+    }
+    file.close();
+    file.clear();
+    temp.close();
+    temp.clear();
     remove("addressBook.txt");
-    addVectorToFile(personVector);
+    rename("temp.txt", "addressBook.txt");
 }
 
-//vector<Person> deletePerson(vector<Person> personVector, int i) {
-    personVector.erase(personVector.begin() + i);
-    deleteOldFileAndAddNewFileWithVector(personVector);
-    return personVector;
-}
-*/
 vector<Person> choiceDeleteMenu(vector<Person> personVector, int idNumber, int userId) {
 
     char character;
@@ -328,7 +315,7 @@ vector<Person> choiceDeleteMenu(vector<Person> personVector, int idNumber, int u
 
     switch(character) {
     case 't':
-        deleteContactFromFile(idNumber);
+        deletePersonFromFile(idNumber);
         personVector.erase(personVector.begin(),personVector.end());
         personVector = loadPersonsToFile(userId);
         break;
@@ -377,12 +364,49 @@ vector<Person> deleteOnePersonMenu(vector<Person> personVector, int idUser) {
     return personVector;
 }
 
+void updatePersonInFile(int loggedUserID)
+{
+    Person person;
+	fstream file;
+	fstream temp;
+	file.open("addressBook.txt", ios::in);
+	temp.open("temp.txt", ios::out);
+	if (file.good() && temp.good())
+	{
+		string loadedLine;
+		while (getline(file, loadedLine))
+		{
+			if (loadedLine[0] - '0' == person.id)
+			{
+				temp << person.id << "|";
+				temp << person.userId << "|";
+				temp << person.name << "|";
+				temp << person.lastname << "|";
+				temp << person.phoneNumber << "|";
+				temp << person.email << "|";
+				temp << person.address << "|" << endl;
+				continue;
+			}
+			temp << loadedLine << endl;
+		}
+	}
+	file.close();
+	file.clear();
+	temp.close();
+	temp.clear();
+	remove("addressBook.txt");
+	rename("temp.txt", "addressBook.txt");
+}
+
+
+
 vector<Person> changeName(vector<Person> personVector, int i) {
     string name;
     cout<<"Podaj nowe imie: ";
     getline(cin, name);
     name = replaceToUppercase(name);
     personVector[i].name = name;
+    updatePersonInFile(i);
     cout<< "Imie zostalo zmienione";
     Sleep(1000);
 
@@ -509,7 +533,7 @@ vector<Person> changePersonDetails(vector<Person> personVector) {
 }
 
 
-void menuAddressBook(int userId){
+void menuAddressBook(int userId) {
 
     vector<Person> personVector;
     personVector = loadPersonsToFile(userId);
@@ -566,21 +590,21 @@ void menuAddressBook(int userId){
 
 struct User {
 
-string username;
-string password;
-int id;
+    string username;
+    string password;
+    int id;
 
 };
 
-bool findUsernameInDataBase(vector<User> userVector, string username){
+bool findUsernameInDataBase(vector<User> userVector, string username) {
 
-for(int i = 0; i < userVector.size(); i++){
+    for(int i = 0; i < userVector.size(); i++) {
 
-    if(userVector[i].username == username){
-        return true;
+        if(userVector[i].username == username) {
+            return true;
+        }
     }
-}
-return false;
+    return false;
 }
 
 vector<User> loadUserAccountFile() {
@@ -696,47 +720,47 @@ int loginUser(vector<User> userVector) {
         }
         i++;
     }
-            cout << "Nie istnieje uzytkownik o takiej nazwie.";
-            Sleep(1500);
-            return 0;
+    cout << "Nie istnieje uzytkownik o takiej nazwie.";
+    Sleep(1500);
+    return 0;
 }
 
 void menuLoginAndRegister(vector<User> userVector) {
 
-char character;
-int userId = 0;
+    char character;
+    int userId = 0;
 
-while(true){
-    system("cls");
-    cout << "+---------------------------------+" << endl;
-    cout << "|      >>>> Menu Glowne <<<<      |" << endl;
-    cout << "|---------------------------------|" << endl;
-    cout << "|1.Rejestracja                    |" << endl;
-    cout << "|2.Logowanie                      |" << endl;
-    cout << "|3.Wyjscie                        |" << endl;
-    cout << "+---------------------------------+" << endl;
+    while(true) {
+        system("cls");
+        cout << "+---------------------------------+" << endl;
+        cout << "|      >>>> Menu Glowne <<<<      |" << endl;
+        cout << "|---------------------------------|" << endl;
+        cout << "|1.Rejestracja                    |" << endl;
+        cout << "|2.Logowanie                      |" << endl;
+        cout << "|3.Wyjscie                        |" << endl;
+        cout << "+---------------------------------+" << endl;
 
-    character = loadCharacter();
+        character = loadCharacter();
 
-    switch(character) {
+        switch(character) {
 
-    case '1':
-        userVector = registerUser(userVector);
-        break;
-    case '2':
-        userId = loginUser(userVector);
-        if(userId != 0){
-            menuAddressBook(userId);
+        case '1':
+            userVector = registerUser(userVector);
+            break;
+        case '2':
+            userId = loginUser(userVector);
+            if(userId != 0) {
+                menuAddressBook(userId);
+            }
+            break;
+        case '3':
+
+            cout << "Do zobaczenia!";
+            Sleep(1000);
+            exit('0');
         }
-        break;
-    case '3':
 
-        cout << "Do zobaczenia!";
-        Sleep(1000);
-        exit('0');
     }
-
-}
 
 }
 
