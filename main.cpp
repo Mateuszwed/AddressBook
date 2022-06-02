@@ -32,6 +32,7 @@ string loadLine() {
 //------------------------------------------Address Book---------------------------------
 struct Person {
     int id;
+    int userId;
     string name;
     string lastname;
     string phoneNumber;
@@ -46,17 +47,19 @@ string replaceToUppercase(string word) {
 }
 
 
-vector<Person> loadPersonsToFile() {
+vector<Person> loadPersonsToFile(int idUser) {
     Person person;
     vector<Person> personVector;
     fstream file;
     file.open("addressBook.txt", ios::in);
 
     int IdNumber;
-    string id, name, lastname, phoneNumber, email, address;
+    int idUserWithFile;
+    string id, idUserWithFileString, name, lastname, phoneNumber, email, address;
 
     while(file.good()) {
         getline(file, id, '|');
+        getline(file, idUserWithFileString, '|');
         getline(file, name, '|');
         getline(file, lastname, '|');
         getline(file, phoneNumber, '|');
@@ -65,9 +68,10 @@ vector<Person> loadPersonsToFile() {
         if(!file.good()) {
             break;
         }
-
+        idUserWithFile = atoi(idUserWithFileString.c_str());
         IdNumber = atoi(id.c_str());
 
+        if(idUserWithFile == idUser){
         person.id = IdNumber;
         person.name = name;
         person.lastname = lastname;
@@ -75,7 +79,7 @@ vector<Person> loadPersonsToFile() {
         person.email = email;
         person.address = address;
         personVector.push_back(person);
-
+        }
 
     }
     file.close();
@@ -88,6 +92,7 @@ void addVectorToFile(vector<Person> personVector) {
 
     for(int i = 0; i < personVector.size(); i++) {
         file << personVector[i].id << '|';
+        file << personVector[i].userId << '|';
         file << personVector[i].name << '|';
         file << personVector[i].lastname << '|';
         file << personVector[i].phoneNumber << '|';
@@ -102,6 +107,7 @@ void addPersonToFile(Person person) {
     file.open("addressBook.txt", ios::out | ios::app);
 
     file << person.id << '|';
+    file << person.userId << '|';
     file << person.name << '|';
     file << person.lastname << '|';
     file << person.phoneNumber << '|';
@@ -111,7 +117,35 @@ void addPersonToFile(Person person) {
     file.close();
 }
 
-vector<Person> addPerson(vector<Person> personVector) {
+int lastPersonId() {
+
+    string textLine = "";
+    string idToConvert = "";
+    int lastID = 0;
+
+    fstream file;
+    file.open("addressBook.txt", ios::in);
+    if (!file.good())
+        return 0;
+    else {
+        int i = 0;
+        while (getline(file, textLine)) {
+            if (textLine[0] != ' ') {
+                idToConvert = "";
+                i = 0;
+                while (textLine[i] != '|') {
+                    idToConvert += textLine[i];
+                    i++;
+                }
+            }
+        }
+        lastID = atoi(idToConvert.c_str());
+        return lastID;
+    }
+}
+
+
+vector<Person> addPerson(vector<Person> personVector, int userId) {
     Person person;
 
     system("cls");
@@ -119,7 +153,7 @@ vector<Person> addPerson(vector<Person> personVector) {
     cout << "|     >>>DODAWANIE NOWEJ OSOBY<<<    |" << endl;
     cout << "|------------------------------------|" << endl << endl;
 
-    int id;
+    int id = 0;
     string name, lastname, phoneNumber, email, address;
 
     cout << "Podaj imie: ";
@@ -133,16 +167,11 @@ vector<Person> addPerson(vector<Person> personVector) {
     cout << "Podaj adres: ";
     address = loadLine();
 
-    if(personVector.empty()) {
-        id = 1;
-    } else {
-        id = personVector[personVector.size()-1].id + 1;
-    }
-
     name = replaceToUppercase(name);
     lastname = replaceToUppercase(lastname);
 
-    person.id = id;
+    person.id = lastPersonId() + 1;
+    person.userId = userId;
     person.name = name;
     person.lastname = lastname;
     person.phoneNumber = phoneNumber;
@@ -453,8 +482,11 @@ vector<Person> changePersonDetails(vector<Person> personVector) {
 }
 
 
-void menuAddressBook(char character, vector<Person> personVector){
+void menuAddressBook(int userId){
 
+    vector<Person> personVector;
+    personVector;
+    char character;
     while(true) {
         system("cls");
         cout << "+---------------------------------+" << endl;
@@ -467,14 +499,14 @@ void menuAddressBook(char character, vector<Person> personVector){
         cout << "|5.Edytuj adresata                |" << endl;
         cout << "|6.Usun adresata                  |" << endl;
         cout << "|7.Usun wszystkich adresatow      |" << endl;
-        cout << "|9.Wyjdz                          |" << endl;
+        cout << "|9.Wyloguj                        |" << endl;
         cout << "+---------------------------------+" << endl;
 
         character = loadCharacter();
 
         switch(character) {
         case '1':
-            personVector = addPerson(personVector);
+            personVector = addPerson(personVector, userId);
             break;
         case '2':
             findByName(personVector);
@@ -497,7 +529,7 @@ void menuAddressBook(char character, vector<Person> personVector){
         case '9':
             cout << "Do zobaczenia!";
             Sleep(1000);
-            exit('0');
+            return;
         }
 
     }
@@ -530,7 +562,7 @@ vector<User> loadUserAccountFile() {
     fstream file;
     file.open("UserAccount.txt", ios::in);
 
-    int IdNumber;
+    int idNumber;
     string id, username, password;
 
     while(file.good()) {
@@ -542,9 +574,9 @@ vector<User> loadUserAccountFile() {
             break;
         }
 
-        IdNumber = atoi(id.c_str());
+        idNumber = atoi(id.c_str());
 
-        user.id = IdNumber;
+        user.id = idNumber;
         user.username = username;
         user.password = password;
         userVector.push_back(user);
@@ -619,8 +651,8 @@ int loginUser(vector<User> userVector) {
 
         if(userVector[i].username == username) {
 
-            for(int i = 0; i < TRIALS; i++) {
-                cout << ">> Liczba prob: " << TRIALS - i << endl;
+            for(int j = 0; j < TRIALS; j++) {
+                cout << ">> Liczba prob: " << TRIALS - j << endl;
                 cout << "Podaj haslo: ";
                 password = loadLine();
                 if(userVector[i].password == password) {
@@ -634,18 +666,18 @@ int loginUser(vector<User> userVector) {
             cout << "Podales 3 razy nieprawidlowe haslo.";
             Sleep(3000);
             return 0;
-        } else {
+        }
+        i++;
+    }
             cout << "Nie istnieje uzytkownik o takiej nazwie.";
             Sleep(1500);
-            return userVector.size();
-        }
-    }
-
+            return 0;
 }
 
-void menuLoginAndRegister(char character, vector<User> userVector) {
+void menuLoginAndRegister(vector<User> userVector) {
 
-int userId;
+char character;
+int userId = 0;
 
 while(true){
     system("cls");
@@ -666,6 +698,9 @@ while(true){
         break;
     case '2':
         userId = loginUser(userVector);
+        if(userId != 0){
+            menuAddressBook(userId);
+        }
         break;
     case '3':
 
@@ -680,14 +715,10 @@ while(true){
 
 int main() {
 
-    char character;
-    vector<Person> personVector;
     vector<User> userVector;
-    int userId;
-    personVector = loadPersonsToFile();
     userVector = loadUserAccountFile();
 
-    menuLoginAndRegister(character, userVector);
+    menuLoginAndRegister(userVector);
 
     //menuAddressBook(character, personVector);
 
