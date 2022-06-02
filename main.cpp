@@ -102,7 +102,7 @@ void addVectorToFile(vector<Person> personVector) {
     file.close();
 }
 
-void addPersonToFile(Person person) {
+void addPersonToFile(Person person,int userId) {
     fstream file;
     file.open("addressBook.txt", ios::out | ios::app);
 
@@ -178,7 +178,7 @@ vector<Person> addPerson(vector<Person> personVector, int userId) {
     person.email = email;
     person.address = address;
     personVector.push_back(person);
-    addPersonToFile(person);
+    addPersonToFile(person, userId);
 
     cout << endl << "Osoba zostala dodana.";
     Sleep(1300);
@@ -485,7 +485,7 @@ vector<Person> changePersonDetails(vector<Person> personVector) {
 void menuAddressBook(int userId){
 
     vector<Person> personVector;
-    personVector;
+    personVector = loadPersonsToFile(userId);
     char character;
     while(true) {
         system("cls");
