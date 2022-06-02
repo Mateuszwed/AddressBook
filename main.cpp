@@ -283,18 +283,43 @@ vector<Person> deleteAllPersons(vector<Person> personVector) {
     return personVector;
 }
 
+
+void deleteContactFromFile(int idNumber)
+{
+	fstream file, temp;
+	file.open("addressBook.txt", ios::in);
+	temp.open("temp.txt", ios::out);
+	if (file.good() && temp.good())
+	{
+		string loadedLine;
+		while (getline(file, loadedLine))
+		{
+			if (loadedLine[0] - '0' == idNumber)
+				continue;
+			temp << loadedLine << endl;
+		}
+	}
+	file.close();
+	file.clear();
+	temp.close();
+	temp.clear();
+	remove("addressBook.txt");
+	rename("temp.txt", "addressBook.txt");
+}
+
+/*
 void deleteOldFileAndAddNewFileWithVector (vector<Person> personVector) {
     remove("addressBook.txt");
     addVectorToFile(personVector);
 }
 
-vector<Person> deletePerson(vector<Person> personVector, int i) {
+//vector<Person> deletePerson(vector<Person> personVector, int i) {
     personVector.erase(personVector.begin() + i);
     deleteOldFileAndAddNewFileWithVector(personVector);
     return personVector;
 }
-
-vector<Person> choiceDeleteMenu(vector<Person> personVector, int iteratorNumberId) {
+*/
+vector<Person> choiceDeleteMenu(vector<Person> personVector, int idNumber, int userId) {
 
     char character;
     cout << "Czy na pewno chcesz usunac? <t/n>" << endl;
@@ -303,7 +328,9 @@ vector<Person> choiceDeleteMenu(vector<Person> personVector, int iteratorNumberI
 
     switch(character) {
     case 't':
-        personVector = deletePerson(personVector, iteratorNumberId);
+        deleteContactFromFile(idNumber);
+        personVector.erase(personVector.begin(),personVector.end());
+        personVector = loadPersonsToFile(userId);
         break;
     case 'n':
         return personVector;
@@ -315,7 +342,7 @@ vector<Person> choiceDeleteMenu(vector<Person> personVector, int iteratorNumberI
     return personVector;
 }
 
-vector<Person> deleteOnePersonMenu(vector<Person> personVector) {
+vector<Person> deleteOnePersonMenu(vector<Person> personVector, int idUser) {
 
     int idNumber;
     int iteratorNumberId;
@@ -340,7 +367,7 @@ vector<Person> deleteOnePersonMenu(vector<Person> personVector) {
     }
 
     if(found) {
-        personVector = choiceDeleteMenu(personVector, iteratorNumberId);
+        personVector = choiceDeleteMenu(personVector, idNumber, idUser);
         cout << "Osoba o numerze Id " << idNumber << " zostala usunieta";
         Sleep(1500);
     } else {
@@ -521,7 +548,7 @@ void menuAddressBook(int userId){
             personVector = changePersonDetails(personVector);
             break;
         case '6':
-            personVector = deleteOnePersonMenu(personVector);
+            personVector = deleteOnePersonMenu(personVector, userId);
             break;
         case '7':
             personVector = deleteAllPersons(personVector);
