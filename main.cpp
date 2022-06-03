@@ -556,6 +556,7 @@ void menuAddressBook(vector<User> userVector, int userId) {
 
     vector<Person> personVector;
     personVector = loadPersonsToFile(userId);
+    personVector = loadPersonsToFile(userId);
     char character;
     while(true) {
         system("cls");
@@ -568,7 +569,6 @@ void menuAddressBook(vector<User> userVector, int userId) {
         cout << "|4.Wyswietl wszystkich adresatow  |" << endl;
         cout << "|5.Edytuj adresata                |" << endl;
         cout << "|6.Usun adresata                  |" << endl;
-        cout << "|7.Usun wszystkich adresatow      |" << endl;
         cout << "|9.Wyloguj                        |" << endl;
         cout << "+---------------------------------+" << endl;
         cout << "|      >>>> Edycja Konta <<<<     |" << endl;
@@ -744,11 +744,11 @@ int loginUser(vector<User> userVector) {
 void menuLoginAndRegister() {
 
     vector<User> userVector;
-    userVector = loadUserAccountFile();
     char character;
     int userId = 0;
 
     while(true) {
+        userVector = loadUserAccountFile();
         system("cls");
         cout << "+---------------------------------+" << endl;
         cout << "|      >>>> Menu Glowne <<<<      |" << endl;
